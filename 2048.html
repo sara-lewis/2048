@@ -1,0 +1,333 @@
+<html>
+<head>
+<title> 2048 </title>
+<style>
+html, body {
+margin: 0;
+padding: 10px;
+background: #faf8ef;
+color: #ffffff;
+font-family: "Helvetica Neue", Arial, sans-serif;
+font-size: 36px;
+font-weight: bolder;
+}
+
+.grid-container {
+position: absolute;
+z-index: 1;
+}
+
+.grid-row {
+margin-bottom: 15px;
+}
+
+.grid-row:last-child {
+margin-bottom: 0;
+}
+
+.grid-row:after {
+content: "";
+display: block;
+clear: both;
+}
+
+.grid-cell {
+width: 106.25px;
+height: 106.25px;
+margin-right: 15px;
+float: left;
+border-radius: 3px;
+text-align: center;
+background: rgba(238, 228, 218, 0.35);
+}
+
+.grid-cell:last-child {
+margin-right: 0;
+}
+
+.game-container {
+margin-top: 40px;
+position: relative;
+padding: 15px;
+cursor: default;
+background: #bbada0;
+border-radius: 6px;
+width: 500px;
+height: 500px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+</style>
+
+<script> 
+        // Make grid
+
+    var board = [[0, 0, 0, 0],
+                 [0, 0, 0, 0],
+                 [0, 0, 0, 0],
+                 [0, 0, 0, 0]];
+
+
+    // Name: newTile
+    // Function: creates a new tile as long as the current value is 0
+    // Inputs: none
+    // Outputs: none
+    // Note: we've called newTile within newTile
+    function newTile() {  
+        var i = Math.round(Math.random() * 3), j = Math.round(Math.random() * 3);
+
+        if (board[i][j] === 0) {
+            board[i][j] = 2;
+        } else {
+            newTile();
+        }
+    }
+
+    // Name: redrawBoard
+    // Function: assigns value to each square
+    // Inputs: none
+    // Outputs: none
+    function redrawBoard() {
+        for (var i = 0; i<board.length; i++){
+            for (var j=0; j<board[i].length; j++){
+                var square = "r" + i + "c" + j;
+                if (board[i][j]!=0) {
+                    document.getElementById(square).innerHTML= board[i][j];
+                } else {
+                    document.getElementById(square).innerHTML=""
+                }
+            }
+        }
+    };
+
+    // Name: colorBoard
+    // Functions: assigns colors based on value
+    // Inputs: none
+    // Outputs: none
+    function colorBoard() {
+        for (var i=0; i<board.length; i++) {
+            for (var j=0; j<board[i].length; j++) {
+                var square = "r" + i + "c" + j;
+                if(board[i][j] == 2){
+                document.getElementById(square).style.background = "#f0e5da";
+                }
+                else if(board[i][j] == 4){
+                document.getElementById(square).style.background = "#ede2c8";
+                }
+                else if(board[i][j] == 8){
+                document.getElementById(square).style.background = "#feb578";
+                }
+                else if(board[i][j] == 16){
+                document.getElementById(square).style.background = "#ff9962";
+                }
+                else if(board[i][j] == 32){
+                document.getElementById(square).style.background = "#ff8060";
+                }
+                else if(board[i][j] == 64){
+                document.getElementById(square).style.background = "#ff613c";
+                }
+                else if(board[i][j] == 128){
+                document.getElementById(square).style.background = "#efd26d";
+                }
+                else if(board[i][j] == 256){
+                document.getElementById(square).style.background = "#efd15c";
+                }
+                else if(board[i][j] == 512){
+                document.getElementById(square).style.background = "#efcd4a";
+                }
+                else if(board[i][j] == 1024){
+                document.getElementById(square).style.background = "#f0ca36";
+                }
+                else if(board[i][j] == 2048){
+                document.getElementById(square).style.background = "#eeca00";
+                }
+                else{
+                document.getElementById(square).style.background = "#ccc0b3";
+                }
+            }
+        }
+    };
+
+    // Name: arrowPress
+    // Functions: 
+    // Inputs: e
+    // Outputs: none 
+
+    function arrowPress(e) {
+        var dir = "";
+        if (e.keyCode==37) {
+            dir="left";
+            for (var i=0; i<board.length; i++) {
+                for (var j=0; j<board[i].length; j++) {
+                    if (checkMove(dir,i,j)) {
+                        moveTile(dir,i,j);
+                    }
+                }
+            }
+        }
+
+        if (e.keyCode==38) {
+            dir="up";
+            for (var j=0; j<board.length; j++) {
+                for (var i=0; i<=3; i++) {
+                    if (checkMove(dir,i,j)) {
+                        moveTile(dir,i,j);
+                    }
+                }
+            }
+        }
+
+        if (e.keyCode==39){
+            dir="right";
+            for (var i=0; i<board.length; i++) {
+                for (var j=3; j>=0; j--){
+                    if (checkMove(dir,i,j)){
+                        moveTile(dir,i,j);
+                    }
+                }
+            }
+        }
+
+        if (e.keyCode==40){
+            dir="down";
+            for (var j=0; j<board.length; j++) {
+                for (var i=3; i>=0; i--){
+                    if (checkMove(dir,i,j)){
+                        moveTile(dir,i,j);
+                    }
+                }
+            }
+        }
+        redrawBoard();
+        colorBoard();
+        newTile(); 
+    };
+
+
+    // Name: checkMove
+    // Function: checks whether or not a tile should be moved 
+    // Inputs: dir, i, j 
+    // Outputs: True or false
+    function checkMove(dir,i,j) {
+        if (dir=="left"){
+            if (j==0){
+                return false; 
+            } else if(board[i][j-1]!=0 && board[i][j]!=board[i][j-1] || board[i][j]==0) {
+                return false; 
+            } else {
+                return true; 
+            }
+        }
+
+        if (dir=="right"){
+            if (j==3){
+                return false; 
+            } else if(board[i][j+1]!=0 && board[i][j]!=board[i][j+1] || board[i][j]==0) {
+                return false; 
+            } else {
+                return true; 
+            }
+        }
+
+        if (dir=="up"){
+            if (i==0){
+                return false; 
+            } else if(board[i-1][j]!=0 && board[i][j]!=board[i-1][j] || board[i][j]==0) {
+                return false; 
+            } else {
+                return true; 
+            }
+        }
+
+        if (dir=="down"){
+            if (i==3){
+                return false; 
+            } else if(board[i+1][j]!=0 && board[i][j]!=board[i+1][j] || board[i][j]==0) {
+                return false; 
+            } else {
+                return true; 
+            }
+        }
+    }; 
+
+    function moveTile(dir,i,j) {
+        if(dir=="left") {
+            if(board[i][j]==board[i][j-1]){
+                board[i][j-1]=2*board[i][j]; 
+            } else {
+                board[i][j-1]=board[i][j];
+            }
+        } 
+
+        if(dir=="right") {
+            if(board[i][j]==board[i][j+1]){
+                board[i][j+1]=2*board[i][j]; 
+            } else {
+                board[i][j+1]=board[i][j];
+            }
+        } 
+
+        if(dir=="up") {
+            if(board[i][j]==board[i-1][j]){
+                board[i-1][j]=2*board[i][j]; 
+            } else {
+                board[i-1][j]=board[i][j];
+            }
+        } 
+
+        if(dir=="down") {
+            if(board[i][j]==board[i+1][j]){
+                board[i+1][j]=2*board[i][j]; 
+            } else {
+                board[i+1][j]=board[i][j];
+            }
+        } 
+
+        board[i][j]=0;
+    };
+
+    // Name: runGame
+    // Function: sets up the game
+    // Inputs: none
+    // Outputs: none
+    function runGame() {
+        newTile();
+        redrawBoard();
+        colorBoard();
+    };
+
+</script>
+
+</head>
+<body onload = "runGame();" onkeydown = "arrowPress(event)">
+<div class="game-container">
+<div class="grid-container">
+<div class="grid-row">
+<div class="grid-cell" id = "r0c0"></div>
+<div class="grid-cell" id = "r0c1"></div>
+<div class="grid-cell" id = "r0c2"></div>
+<div class="grid-cell" id = "r0c3"></div>
+</div>
+<div class="grid-row">
+<div class="grid-cell" id = "r1c0"></div>
+<div class="grid-cell" id = "r1c1"></div>
+<div class="grid-cell" id = "r1c2"></div>
+<div class="grid-cell" id = "r1c3"></div>
+</div>
+<div class="grid-row">
+<div class="grid-cell" id = "r2c0"></div>
+<div class="grid-cell" id = "r2c1"></div>
+<div class="grid-cell" id = "r2c2"></div>
+<div class="grid-cell" id = "r2c3"></div>
+</div>
+<div class="grid-row">
+<div class="grid-cell" id = "r3c0"></div>
+<div class="grid-cell" id = "r3c1"></div>
+<div class="grid-cell" id = "r3c2"></div>
+<div class="grid-cell" id = "r3c3"></div>
+</div>
+</div>
+</div>
+</body>
+</html>
